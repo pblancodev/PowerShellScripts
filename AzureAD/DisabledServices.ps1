@@ -18,5 +18,14 @@ Get-MsolAccountSku | Select AccountSkuId | Sort AccountSkuId
 $LO=New-MsolLicenseOptions -AccountSkuId "reseller-account:O365_BUSINESS_PREMIUM" -DisabledPlans  "EXCHANGE_S_STANDARD"
 
 
-## Paso 5 deshabilitar el servicio en los usu
+## Paso 5 Cargar la lista de Cuentas a Deshabilitar
 
+$correos = Import-Csv -Path C:\Users\pedro.blanco\o365
+
+
+foreach ($correos in $correos) {
+
+    Set-MsolUserLicense -UserPrincipalName $correos -LicenseOptions $LO
+
+    
+}
