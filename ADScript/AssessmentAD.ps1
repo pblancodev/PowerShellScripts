@@ -1,8 +1,3 @@
-
-
-
-
-
 $root = $root = [Environment]::GetFolderPath("MyDocuments")
 
 $Principalroot = "$root\AssessmentAD"
@@ -222,17 +217,30 @@ $alldivice = Get-ADComputer -Filter *
 
 # Guardar la cantidad de dispositivospor variable
 
-$numberWindowsserver = $windowsServer.Count
+$numberWindowsserver = (Get-ADComputer -Filter 'operatingsystem -like "*Windows server*" -and enabled -eq "true"' -Properties Name,Operatingsystem,OperatingSystemVersion,OperatingSystemServicePack,IPv4Address |
+    Sort-Object -Property Operatingsystem |
+    Select-Object -Property Name, Operatingsystem, OperatingSystemVersion).Count
 
-$numberWindows11 = $windows11.Count
+$numberWindows11 = (Get-ADComputer -Filter 'operatingsystem -like "*Windows 11*" -and enabled -eq "true"' -Properties Name,Operatingsystem,OperatingSystemVersion,OperatingSystemServicePack,IPv4Address |
+    Sort-Object -Property Operatingsystem |
+    Select-Object -Property Name, Operatingsystem, OperatingSystemVersion).Count
 
-$numberWindows10 = $windows10.Count
+$numberWindows10 = (Get-ADComputer -Filter 'operatingsystem -like "*Windows 10*" -and enabled -eq "true"' -Properties Name,Operatingsystem,OperatingSystemVersion,OperatingSystemServicePack,IPv4Address |
+    Sort-Object -Property Operatingsystem |
+    Select-Object -Property Name, Operatingsystem, OperatingSystemVersion).Count
 
-$numberWindows8 = $windows8.Count
+$numberWindows8 = (Get-ADComputer -Filter 'operatingsystem -like "*Windows 8*" -and enabled -eq "true"' -Properties Name,Operatingsystem,OperatingSystemVersion,OperatingSystemServicePack,IPv4Address |
+    Sort-Object -Property Operatingsystem |
+    Select-Object -Property Name, Operatingsystem, OperatingSystemVersion).Count
 
-$numberWindowsxp = $windowsxp.Count
+$numberWindowsxp = (Get-ADComputer -Filter 'operatingsystem -like "*Windows xp*" -and enabled -eq "true"' -Properties Name,Operatingsystem,OperatingSystemVersion,OperatingSystemServicePack,IPv4Address |
+    Sort-Object -Property Operatingsystem |
+    Select-Object -Property Name, Operatingsystem, OperatingSystemVersion).Count
 
-$numberWindows7 = $windows7.Count
+
+$numberWindows7 = (Get-ADComputer -Filter 'operatingsystem -like "*Windows 7*" -and enabled -eq "true"' -Properties Name,Operatingsystem,OperatingSystemVersion,OperatingSystemServicePack,IPv4Address |
+    Sort-Object -Property Operatingsystem |
+    Select-Object -Property Name, Operatingsystem, OperatingSystemVersion).Count
 
 
 $numberalldivice = $alldivice.Count
@@ -243,7 +251,7 @@ $statsObject = New-Object PSObject -Property @{
     "WindowsServer" = $numberWindowsserver
     "Windows11" = $numberWindows11
     "Windows10" = $numberWindows10
-    "Windows8" = $numberWindows
+    "Windows8" = $numberWindows8
     "Windows7" = $numberWindows7
     "WindowsXP" = $numberWindowsxp
     "ALL" = $numberalldivice
@@ -268,9 +276,9 @@ $statsObject | Export-Csv -Path $CSVFile9 -NoTypeInformation
 
 $CSVFile10 = Join-Path -Path $registerroot -ChildPath "DomainsAdmins.csv"
 
-$DomainADmins =  Get-ADGroupMember "Domain ADmins" | Get-AdUser -Property LastLogonDate | select name,distinguishedName,LastLogonDate
+$DomainADmins = Get-ADGroupMember "Domain ADmins" | Get-ADUser -Property LastLogonDate | Select Name, DistinguishedName, LastLogonDate
 
-$DomainADmins | Export-Csv -Path $csvFile10  -NoTypeInformation
+$DomainADmins | Export-Csv -Path $CSVFile10 -NoTypeInformation
 
 ########### Domain ADMins #####################
 
@@ -279,9 +287,9 @@ $DomainADmins | Export-Csv -Path $csvFile10  -NoTypeInformation
 
 $CSVFile11 = Join-Path -Path $registerroot -ChildPath "Domainschema.csv"
 
-$DomainSchema= Get-ADGroupMember "Schema Admins" | Get-AdUser -Property LastLogonDate | select name,distinguishedName,LastLogonDate
+$DomainSchema = Get-ADGroupMember "Schema Admins" | Get-ADUser -Property LastLogonDate | Select Name, DistinguishedName, LastLogonDate
 
-$DomainSchema | Export-Csv -Path $csvFile11  -NoTypeInformation
+$DomainSchema | Export-Csv -Path $CSVFile11 -NoTypeInformation
 
 ############## Domain schema ##################
 
@@ -291,9 +299,9 @@ $DomainSchema | Export-Csv -Path $csvFile11  -NoTypeInformation
 
 $CSVFile12 = Join-Path -Path $registerroot -ChildPath "Administrators.csv"
 
-$DomainAdministrators = Get-ADGroupMember "Administrators" | Get-AdUser -Property LastLogonDate | select name,distinguishedName,LastLogonDate
+$DomainAdministrators = Get-ADGroupMember "Administrators" | Get-ADUser -Property LastLogonDate | Select Name, DistinguishedName, LastLogonDate
 
-$DomainAdministrators | Export-Csv -Path $csvFile12  -NoTypeInformation
+$DomainAdministrators | Export-Csv -Path $CSVFile12 -NoTypeInformation
 
 ############## Domain Administrators ##################
 
@@ -304,36 +312,36 @@ $DomainAdministrators | Export-Csv -Path $csvFile12  -NoTypeInformation
 
 $CSVFile13 = Join-Path -Path $registerroot -ChildPath "EnterpriseSAdministrators.csv"
 
-$DomainEnterpri = Get-ADGroupMember "Enterprise Admins" | Get-AdUser -Property LastLogonDate | select name,distinguishedName,LastLogonDate
+$DomainEnterpri = Get-ADGroupMember "Enterprise Admins" | Get-ADUser -Property LastLogonDate | Select Name, DistinguishedName, LastLogonDate
 
-$DomainEnterpri | Export-Csv -Path $csvFile13  -NoTypeInformation
+$DomainEnterpri | Export-Csv -Path $CSVFile13 -NoTypeInformation
 
 ############## EnterPrise Administrators ##################
 
-############## Count ADmins ##################
 
-$DomainADminscount = $DomainADmins.Count
+############## Count Admins ##################
 
-$DomainSchemacount = $DomainSchema.Count
+$DomainADminscount = ($DomainADmins | Measure-Object).Count
 
-$DomainAdministratorscount = $DomainAdministrators.Count
+$DomainSchemacount = ($DomainSchema | Measure-Object).Count
 
-$DomainEnterpricount = $DomainEnterpri.Count
+$DomainAdministratorscount = ($DomainAdministrators | Measure-Object).Count
+
+$DomainEnterpricount = ($DomainEnterpri | Measure-Object).Count
 
 $totaladmins = $DomainADminscount + $DomainSchemacount + $DomainAdministratorscount + $DomainEnterpricount 
 
 $objetoadmins = New-Object -TypeName PSObject -Property @{
-    "Domain Admin" = $DomainADminscount
-    "Domain Schema" = $DomainSchemacount
-    "Domain Administrators" = $DomainAdministratorscount
-    "Enterprise Administrators"= $DomainEnterpricount
-    "Total Admins" = $totaladmins 
-
+    TotalAdmins = $totaladmins 
+    EnterpriseAdministrators = $DomainEnterpricount
+    DomainAdmin = $DomainADminscount
+    DomainAdministrators = $DomainAdministratorscount
+    DomainSchema = $DomainSchemacount
 }
 
-$CSVFile13 = Join-Path -Path $registerroot -ChildPath "TotalAdmins.csv"
+$CSVFile14 = Join-Path -Path $registerroot -ChildPath "TotalAdmins.csv"
 
-$objetoadmins | Export-Csv -Path $csvFile13  -NoTypeInformation
+$objetoadmins | Export-Csv -Path $CSVFile14 -NoTypeInformation
 
 ############## Count ADmins ##################
 
@@ -419,6 +427,9 @@ $PasswordNeverExpireDetails | Export-Csv -Path $csvFile18 -NoTypeInformation
 
 
 #################   Paswword Never Expire Details  #####################
+
+
+
 
 
 
