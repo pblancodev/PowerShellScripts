@@ -375,27 +375,21 @@ $objetototaladacount | Export-Csv -Path $CSVFile15  -NoTypeInformation
 ###################  all users , Devices , groups ###########################################
 
 
-
 ################## Users Password Never Expire  #####################
 
 $CSVFile16 = Join-Path -Path $registerroot -ChildPath "allUsersPasswordNeverExpire.csv"
 
-$allNeverExpire = Get-ADUser -filter {PasswordNeverExpires -eq "TRUE"} -Properties PasswordNeverExpires | select name,samaccountname,PasswordNeverExpires,mail | Where-Object {$_.PasswordNeverExpires -like "True"}
+$allNeverExpire = Get-ADUser -Filter {PasswordNeverExpires -eq "TRUE"} -Properties PasswordNeverExpires | Select Name, SamAccountName, PasswordNeverExpires, Mail | Where-Object { $_.PasswordNeverExpires -like "True" }
 
-$allNeverExpire | Export-Csv -Path $csvFile16  -NoTypeInformation
+$allNeverExpire | Export-Csv -Path $csvFile16 -NoTypeInformation
 
-
-################## Users Password Never Expire  #####################
-
+$allNeverExpirecount = $allNeverExpire.Count
 
 #################  Admin Password Never Expire Domain Admins   #####################
 
 $CSVFile17 = Join-Path -Path $registerroot -ChildPath "DomainADminsPasswordneverexpire.csv"
 
-
 $domainAdminsMembers = Get-ADGroupMember -Identity "Domain admins"
-
-
 
 $domainAdmins = $domainAdminsMembers | ForEach-Object {
     $user = Get-ADUser -Identity $_.SamAccountName -Properties PasswordNeverExpires, LastLogonDate
@@ -404,14 +398,27 @@ $domainAdmins = $domainAdminsMembers | ForEach-Object {
     }
 }
 
+$domainAdmins | Export-Csv -Path $csvFile17 -NoTypeInformation
 
-$domainAdmins| Export-Csv -Path $csvFile17  -NoTypeInformation
+#################  Admin Password Never Expire Domain Admins   #####################
+
+#################   Paswword Never Expire Details  #####################
+
+$CSVFile18 = Join-Path -Path $registerroot -ChildPath "PasswordNeverExpireCount.csv"
+
+$DomainAdminsCount = (Get-ADUser -Filter {PasswordNeverExpires -eq "TRUE"}).Count
+
+$PasswordNeverExpireDetails = New-Object -TypeName PSObject -Property @{
+    "Total AD User Password Never Expire" = $DomainAdminsCount
+    "Total AD Admins Password Never Expire" = $allNeverExpirecount
+}
+
+$PasswordNeverExpireDetails
+
+$PasswordNeverExpireDetails | Export-Csv -Path $csvFile18 -NoTypeInformation
 
 
-
-
-$allNeverExpirecount = $allNeverExpire.count
-
+#################   Paswword Never Expire Details  #####################
 
 
 
